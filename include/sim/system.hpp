@@ -52,6 +52,10 @@ namespace sim
         struct velocity_property
         {
         };
+
+        struct mobility_property
+        {
+        };
     }
 
     template<>
@@ -71,6 +75,15 @@ namespace sim
     template<>
     struct property_traits<detail::velocity_property> : sim::basic_property_traits<sim::vector>
     {
+    };
+
+    template<>
+    struct property_traits<detail::mobility_property> : sim::basic_property_traits<sim::scalar>
+    {
+        static constexpr value_type default_value()
+        {
+            return 1;
+        }
     };
 
     namespace detail
@@ -165,6 +178,7 @@ namespace sim
             require_property_array<detail::mass_property>();
             require_property_array<detail::position_property>();
             require_property_array<detail::velocity_property>();
+            require_property_array<detail::mobility_property>();
         }
 
         void add_particle(basic_properties const& props = {})
@@ -229,6 +243,16 @@ namespace sim
         sim::array_view<sim::vector const> velocity_array() const noexcept
         {
             return property_array<detail::velocity_property>();
+        }
+
+        sim::array_view<sim::scalar> mobility_array() noexcept
+        {
+            return property_array<detail::mobility_property>();
+        }
+
+        sim::array_view<sim::scalar const> mobility_array() const noexcept
+        {
+            return property_array<detail::mobility_property>();
         }
 
         void add_forcefield(std::shared_ptr<sim::forcefield> forcefield)
