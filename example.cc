@@ -5,33 +5,12 @@
 #include <sim/all.hpp>
 
 
-class my_forcefield : public sim::forcefield
+class my_forcefield : public sim::pair_forcefield<my_forcefield>
 {
 public:
-    sim::scalar spring_constant = 1;
-
-    sim::scalar compute_energy(sim::system const& system) override
+    inline auto pair_potential(sim::system const&, sim::index, sim::index)
     {
-        auto const particle_count = system.particle_count();
-        auto const positions = system.position_array();
-
-        sim::scalar energy = 0;
-
-        for (sim::index i = 0; i < particle_count; i++) {
-            energy += 0.5 * spring_constant * positions[i].squared_distance({});
-        }
-
-        return energy;
-    }
-
-    void compute_force(sim::system const& system, sim::array_view<sim::vector> forces) override
-    {
-        auto const particle_count = system.particle_count();
-        auto const positions = system.position_array();
-
-        for (sim::index i = 0; i < particle_count; i++) {
-            forces[i] += -spring_constant * positions[i].vector();
-        }
+        return sim::harmonic_potential {.spring_constant = 1};
     }
 };
 
