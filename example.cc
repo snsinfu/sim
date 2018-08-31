@@ -40,31 +40,29 @@ int main()
     sim::system system;
 
     for (int i = 0; i < 100; i++) {
-        system.add_particle({
+        system.add_particle(sim::basic_properties {
             .position = {i / 100.0, 0, 0}
         });
     }
 
     system.add_forcefield(std::make_shared<my_forcefield>());
 
-    std::cout << "Energy: "
-              << system.compute_energy()
-              << " (K = "
-              << system.compute_kinetic_energy()
-              << " | V = "
-              << system.compute_potential_energy()
-              << ")\n";
+    auto const report_energy = [&]() {
+        std::cout << "Energy: "
+                  << system.compute_energy()
+                  << " (K = "
+                  << system.compute_kinetic_energy()
+                  << " | V = "
+                  << system.compute_potential_energy()
+                  << ")\n";
+    };
+
+    report_energy();
 
     sim::simulate_newtonian_dynamics(system, {
         .timestep = 0.001,
         .simulation_length = 1000000
     });
 
-    std::cout << "Energy: "
-              << system.compute_energy()
-              << " (K = "
-              << system.compute_kinetic_energy()
-              << " | V = "
-              << system.compute_potential_energy()
-              << ")\n";
+    report_energy();
 }
