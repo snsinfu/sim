@@ -30,9 +30,9 @@ namespace sim
     class composite_forcefield : public sim::forcefield
     {
     public:
-        void add_component(std::shared_ptr<sim::forcefield> forcefield)
+        void add_component(std::shared_ptr<sim::forcefield> component)
         {
-            components_.push_back(forcefield);
+            components_.push_back(component);
         }
 
         sim::scalar compute_energy(sim::system const& system) override

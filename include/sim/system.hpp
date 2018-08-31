@@ -153,8 +153,8 @@ namespace sim
     struct basic_properties
     {
         sim::scalar mass = sim::property_traits<detail::mass_property>::default_value();
-        sim::point position;
-        sim::vector velocity;
+        sim::point position = {};
+        sim::vector velocity = {};
     };
 
     class system
@@ -169,13 +169,13 @@ namespace sim
 
         void add_particle(basic_properties const& props = {})
         {
-            auto const index = particles_.size();
+            auto const idx = particles_.size();
 
             particles_.resize(particles_.size() + 1);
 
-            mass_array()[index] = props.mass;
-            position_array()[index] = props.position;
-            velocity_array()[index] = props.velocity;
+            mass_array()[idx] = props.mass;
+            position_array()[idx] = props.position;
+            velocity_array()[idx] = props.velocity;
         }
 
         sim::index particle_count() const noexcept

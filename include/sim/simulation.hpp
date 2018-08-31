@@ -34,7 +34,7 @@ namespace sim
 
         system.compute_force(forces);
 
-        for (sim::step step = 0; step < config.simulation_length; step++) {
+        for (sim::step stp = 0; stp < config.simulation_length; stp++) {
             for (sim::index i = 0; i < particle_count; i++) {
                 velocities[i] += (config.timestep / 2) / masses[i] * forces[i];
                 positions[i] += config.timestep * velocities[i];

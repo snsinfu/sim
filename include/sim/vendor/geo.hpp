@@ -388,7 +388,7 @@ namespace geo
         using basic_coords_::begin;
         using basic_coords_::end;
         using basic_coords_::operator[];
-        using vector_type = vector<T, N>;
+        using vector_type = geo::vector<T, N>;
 
         // vector returns the coordinate vector of this point.
         vector_type vector() const noexcept
