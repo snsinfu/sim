@@ -145,8 +145,10 @@ namespace geo
 
     // Stream-out operator for basic_coords prints the coordinate values delimited by spaces.
     template<typename Char, typename Tr, typename T, index N>
-    std::basic_ostream<Char, Tr>& operator<<(std::basic_ostream<Char, Tr>& os,
-                                             basic_coords<T, N> const& coords)
+    std::basic_ostream<Char, Tr>& operator<<(
+        std::basic_ostream<Char, Tr>& os,
+        basic_coords<T, N> const& coords
+    )
     {
         using sentry_type = typename std::basic_ostream<Char, Tr>::sentry;
 
@@ -166,8 +168,10 @@ namespace geo
 
     // Stream-in operator for basic_coords scans coordinate values delimited by spaces.
     template<typename Char, typename Tr, typename T, index N>
-    std::basic_istream<Char, Tr>& operator>>(std::basic_istream<Char, Tr>& is,
-                                             basic_coords<T, N>& coords)
+    std::basic_istream<Char, Tr>& operator>>(
+        std::basic_istream<Char, Tr>& is,
+        basic_coords<T, N>& coords
+    )
     {
         using sentry_type = typename std::basic_ostream<Char, Tr>::sentry;
 
@@ -472,8 +476,11 @@ namespace geo
     // interpolate returns the intermediate point between p and q with given division ratio r.
     // Returns p when r = 0 and q when r = 1.
     template<typename T, index N>
-    point<T, N> interpolate(point<T, N> const& p, point<T, N> const& q,
-                            detail::identity_t<T> r) noexcept
+    point<T, N> interpolate(
+        point<T, N> const& p,
+        point<T, N> const& q,
+        detail::identity_t<T> r
+    ) noexcept
     {
         point<T, N> div;
         for (index i = 0; i < N; ++i) {
@@ -486,8 +493,10 @@ namespace geo
     {
         // element_point is a SFINAE-friendly metafunction to extract the value type of a range
         // assuming it is an instantiation of the point class template.
-        template<typename Range,
-                 typename = typename std::iterator_traits<typename Range::iterator>::scalar_type>
+        template<
+            typename Range,
+            typename = typename std::iterator_traits<typename Range::iterator>::value_type
+        >
         struct element_point;
 
         template<typename Range, typename T, index N>
