@@ -41,8 +41,10 @@ int main()
 
     report_energy();
 
-    sim::simulate_newtonian_dynamics(system, {
-        .timestep = 0.001,
+    sim::simulate_brownian_dynamics(system, {
+        .timestep = 0.01,
+        .spacestep = 0.01,
+        .temperature = 0.1,
         .simulation_length = 1000000
     });
 

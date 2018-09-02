@@ -51,9 +51,31 @@ namespace sim
         }
     }
 
+    namespace detail
+    {
+        inline sim::scalar compute_brownian_timestep(
+            sim::scalar displacement,
+            sim::scalar force,
+            sim::scalar mobility,
+            sim::scalar temperature
+        )
+        {
+            if (force == 0) {
+                return displacement * displacement * M_PI / (16 * mobility * temperature);
+            }
+
+            auto const alpha = 2.535;
+            auto const fluctuation = alpha * temperature / force;
+            auto const drift = std::hypot(fluctuation, displacement) - fluctuation;
+
+            return drift / (mobility * force);
+        }
+    }
+
     struct brownian_dynamics_config
     {
         sim::scalar timestep = 1;
+        sim::scalar spacestep = 0;
         sim::scalar temperature = 1;
         sim::step simulation_length = 1;
         std::uint32_t random_seed = 0;
@@ -76,8 +98,8 @@ namespace sim
         std::vector<sim::vector> forces(particle_count);
         std::vector<sim::vector> previous_weiner(particle_count);
 
-        auto const generate_weiner = [&](sim::scalar mu) {
-            return std::sqrt(2 * mu * config.temperature * config.timestep) * sim::vector {
+        auto const generate_weiner = [&](sim::scalar mu, sim::scalar dt) {
+            return std::sqrt(2 * config.temperature * mu * dt) * sim::vector {
                 normal(random_engine),
                 normal(random_engine),
                 normal(random_engine)
@@ -87,16 +109,32 @@ namespace sim
         system.compute_force(forces);
 
         for (sim::index i = 0; i < particle_count; i++) {
-            previous_weiner[i] = generate_weiner(mobilities[i]);
+            previous_weiner[i] = generate_weiner(mobilities[i], config.timestep);
         }
 
         for (sim::step stp = 0; stp < config.simulation_length; stp++) {
             system.compute_force(forces);
 
+            sim::scalar timestep = config.timestep;
+
+            if (config.spacestep > 0) {
+                for (sim::index i = 0; i < particle_count; i++) {
+                    auto const dt = detail::compute_brownian_timestep(
+                        config.spacestep,
+                        forces[i].norm(),
+                        mobilities[i],
+                        config.temperature
+                    );
+                    if (dt < timestep) {
+                        timestep = dt;
+                    }
+                }
+            }
+
             for (sim::index i = 0; i < particle_count; i++) {
-                auto const weiner = generate_weiner(mobilities[i]);
+                auto const weiner = generate_weiner(mobilities[i], timestep);
                 auto const mean_weiner = 0.5 * (weiner + previous_weiner[i]);
-                positions[i] += mobilities[i] * forces[i] * config.timestep + mean_weiner;
+                positions[i] += mobilities[i] * forces[i] * timestep + mean_weiner;
                 previous_weiner[i] = weiner;
             }
         }
